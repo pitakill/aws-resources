@@ -4,8 +4,13 @@
 package aws_resources
 
 import (
+    "errors"
+	"reflect"
 	"github.com/aws/aws-sdk-go-v2/aws"
 )
+
+var NoServiceMethodName = errors.New("unable to get services unknown methdo")
+
 
 // Type Factory
 type Factory interface {
@@ -16,14 +21,17 @@ type Factory interface {
 	SetService(aws.Config)
 }
 
+type FactoryData interface{
+	CallAWS() (map[string]reflect.Value, error)
+}
+
 type Info func(aws.Config) Factory
 
 type TypeConfig struct {
 	resourceType string
 }
 
-
-var relations = map[string]Info{
+var Relations = map[string]Info{
 	"cloudformation": CloudFormationFactory,
 	{{- range $index, $typ := .Resources }}
 	"{{ ToLower $typ.Name }}": {{ $typ.Name }}Factory,
